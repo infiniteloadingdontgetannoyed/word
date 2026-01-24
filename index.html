@@ -5,13 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Joke Loading</title>
 
+  <!-- Google AdSense -->
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-1518906644344785"
+          crossorigin="anonymous"></script>
+
   <style>
     html, body {
       margin: 0;
       padding: 0;
       width: 100%;
       height: 100%;
-      background-color: #000; /* Fundo preto */
+      background-color: #000; /* fundo preto */
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -50,7 +54,7 @@
       transition: width 0.3s linear;
     }
 
-    /* Espaço para propaganda no final */
+    /* Espaço para propaganda será adicionado dinamicamente */
     .ad-space {
       width: 100%;
       text-align: center;
@@ -74,9 +78,6 @@
     <div class="loading-bar" id="loadingBar"></div>
   </div>
 
-  <!-- Espaço para propaganda -->
-  <div class="ad-space">Your Ad Here</div>
-
   <script>
     const loadingBar = document.getElementById("loadingBar");
     const percentageText = document.getElementById("percentage");
@@ -98,7 +99,7 @@
           phase = 2;
         }
       } else {
-        // Fase 2: lento, travamentos aleatórios
+        // Fase 2: lento, travamentos aleatórios entre 35% e 97%
         if (progress < 97) {
           const target = Math.floor(Math.random() * (97 - Math.ceil(progress)) + Math.ceil(progress));
           progress += Math.random() * 0.5; // avanço lento
@@ -109,7 +110,26 @@
     }
 
     // Loop principal do carregamento
-    const interval = setInterval(moveProgress, 250);
+    setInterval(moveProgress, 250);
+
+    // Adiciona a propaganda (Google AdSense) por último
+    window.addEventListener("load", () => {
+      const ad = document.createElement("div");
+      ad.className = "ad-space";
+
+      ad.innerHTML = `
+        <ins class="adsbygoogle"
+             style="display:block"
+             data-ad-client="ca-pub-1518906644344785"
+             data-ad-slot="YOUR_AD_SLOT"
+             data-ad-format="auto"
+             data-full-width-responsive="true"></ins>
+        <script>
+             (adsbygoogle = window.adsbygoogle || []).push({});
+        <\/script>
+      `;
+      document.body.appendChild(ad);
+    });
 
     // Atualiza a página a cada 3 minutos
     setTimeout(() => {
