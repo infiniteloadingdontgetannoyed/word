@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joke Loading</title>
+
+  <style>
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background-color: #000; /* Fundo preto */
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-family: Arial, sans-serif;
+      position: relative;
+    }
+
+    .joke-text {
+      color: #000; /* invisível */
+      font-size: 18px;
+      position: absolute;
+      top: 10px;
+    }
+
+    .percentage {
+      color: #fff;
+      font-size: 18px;
+      margin-bottom: 14px;
+    }
+
+    .loading-container {
+      width: 80%;
+      max-width: 320px;
+      height: 14px;
+      background-color: #222;
+      border-radius: 7px;
+      overflow: hidden;
+      margin-bottom: 20px;
+    }
+
+    .loading-bar {
+      height: 100%;
+      width: 0%;
+      background-color: #fff;
+      transition: width 0.3s linear;
+    }
+
+    /* Espaço para propaganda no final */
+    .ad-space {
+      width: 100%;
+      text-align: center;
+      position: absolute;
+      bottom: 10px;
+      color: #fff;
+      font-size: 16px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Texto invisível -->
+  <div class="joke-text">This page is a joke</div>
+
+  <!-- Porcentagem -->
+  <div class="percentage" id="percentage">0%</div>
+
+  <!-- Barra de loading -->
+  <div class="loading-container">
+    <div class="loading-bar" id="loadingBar"></div>
+  </div>
+
+  <!-- Espaço para propaganda -->
+  <div class="ad-space">Your Ad Here</div>
+
+  <script>
+    const loadingBar = document.getElementById("loadingBar");
+    const percentageText = document.getElementById("percentage");
+
+    let progress = 0;
+    let phase = 1; // 1 = rápido até 35%, 2 = lento com travamentos
+
+    function updateUI() {
+      loadingBar.style.width = progress + "%";
+      percentageText.textContent = Math.floor(progress) + "%";
+    }
+
+    function moveProgress() {
+      if (phase === 1) {
+        // Fase 1: rápido até 35%
+        progress += 1.5;
+        if (progress >= 35) {
+          progress = 35;
+          phase = 2;
+        }
+      } else {
+        // Fase 2: lento, travamentos aleatórios
+        if (progress < 97) {
+          const target = Math.floor(Math.random() * (97 - Math.ceil(progress)) + Math.ceil(progress));
+          progress += Math.random() * 0.5; // avanço lento
+          if (progress > target) progress = target;
+        }
+      }
+      updateUI();
+    }
+
+    // Loop principal do carregamento
+    const interval = setInterval(moveProgress, 250);
+
+    // Atualiza a página a cada 3 minutos
+    setTimeout(() => {
+      location.reload();
+    }, 180000);
+  </script>
+
+</body>
+</html>
