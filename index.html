@@ -25,7 +25,7 @@
     }
 
     .joke-text {
-      color: #000;
+      color: #000; /* invisible text */
       font-size: 18px;
       position: absolute;
       top: 10px;
@@ -34,15 +34,7 @@
     .percentage {
       color: #fff;
       font-size: 18px;
-      margin-bottom: 10px;
-    }
-
-    .hint {
-      color: #777;
-      font-size: 14px;
-      margin-bottom: 12px;
-      cursor: pointer;
-      user-select: none;
+      margin-bottom: 14px;
     }
 
     .loading-container {
@@ -76,12 +68,13 @@
 
   <!-- If you're reading this, you already lost 😌 -->
 
+  <!-- Invisible joke text at the top -->
   <div class="joke-text">This page is a joke</div>
 
+  <!-- Percentage display -->
   <div class="percentage" id="percentage">0%</div>
 
-  <div class="hint" id="hint">Tap to speed up loading</div>
-
+  <!-- Loading bar container -->
   <div class="loading-container">
     <div class="loading-bar" id="loadingBar"></div>
   </div>
@@ -89,32 +82,36 @@
   <script>
     const loadingBar = document.getElementById("loadingBar");
     const percentageText = document.getElementById("percentage");
-    const hint = document.getElementById("hint");
 
     let progress = 0;
-    let phase = 1; // 1 = rápido até 35, 2 = troll mode
+    let phase = 1; // 1 = fast until 35%, 2 = troll mode
 
+    // Update the loading bar and percentage text
     function updateUI() {
       loadingBar.style.width = progress + "%";
       percentageText.textContent = Math.floor(progress) + "%";
     }
 
+    // Main loading logic
     function moveProgress() {
       if (phase === 1) {
+        // Phase 1: fast progress from 0% to 35%, no stopping
         progress += 1.5;
         if (progress >= 35) {
           progress = 35;
           phase = 2;
         }
       } else {
+        // Phase 2: slow progress from 35% to 97%, with trolling behavior
         if (progress < 97) {
           progress += Math.random() * 0.4;
 
-          // 👿 Às vezes anda para trás
+          // 😈 Occasionally move backwards
           if (Math.random() < 0.05 && progress > 40) {
             progress -= Math.random() * 3;
           }
 
+          // Safety limits
           if (progress > 97) progress = 97;
           if (progress < 35) progress = 35;
         }
@@ -122,21 +119,10 @@
       updateUI();
     }
 
+    // Run the loading loop
     setInterval(moveProgress, 300);
 
-    // 😈 Tap to speed up (mas não ajuda muito)
-    hint.addEventListener("click", () => {
-      progress += 1;
-      if (progress > 97) progress = 97;
-      updateUI();
-
-      hint.textContent = "Speeding up...";
-      setTimeout(() => {
-        hint.textContent = "Tap to speed up loading";
-      }, 1200);
-    });
-
-    // Propaganda por último
+    // Add the ad section last (Google AdSense)
     window.addEventListener("load", () => {
       const ad = document.createElement("div");
       ad.className = "ad-space";
@@ -154,7 +140,7 @@
       document.body.appendChild(ad);
     });
 
-    // Refresh automático
+    // Auto-refresh the page every 3 minutes
     setTimeout(() => {
       location.reload();
     }, 180000);
