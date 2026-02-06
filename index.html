@@ -34,7 +34,15 @@
     .percentage {
       color: #fff;
       font-size: 18px;
-      margin-bottom: 14px;
+      margin-bottom: 10px;
+    }
+
+    .almost {
+      color: #888;
+      font-size: 14px;
+      margin-bottom: 10px;
+      opacity: 0;
+      transition: opacity 0.2s;
     }
 
     .loading-container {
@@ -68,13 +76,11 @@
 
   <!-- If you're reading this, you already lost 😌 -->
 
-  <!-- Invisible joke text at the top -->
   <div class="joke-text">This page is a joke</div>
 
-  <!-- Percentage display -->
   <div class="percentage" id="percentage">0%</div>
+  <div class="almost" id="almost">Almost there…</div>
 
-  <!-- Loading bar container -->
   <div class="loading-container">
     <div class="loading-bar" id="loadingBar"></div>
   </div>
@@ -82,47 +88,90 @@
   <script>
     const loadingBar = document.getElementById("loadingBar");
     const percentageText = document.getElementById("percentage");
+    const almostText = document.getElementById("almost");
 
     let progress = 0;
-    let phase = 1; // 1 = fast until 35%, 2 = troll mode
+    let phase = 1;
+    let stuckAt99 = false;
+    let pausedUntil = 0;
 
-    // Update the loading bar and percentage text
+    // Console message for developers
+    console.log("%cStill watching the loader?", "color:#555");
+
+    function vibrate() {
+      if (navigator.vibrate) navigator.vibrate(80);
+    }
+
     function updateUI() {
-      loadingBar.style.width = progress + "%";
+      // Idea (3): visual bar does not fully match the percentage near the end
+      let visualProgress = progress;
+      if (progress > 90) {
+        visualProgress = progress - 5;
+      }
+
+      loadingBar.style.width = visualProgress + "%";
       percentageText.textContent = Math.floor(progress) + "%";
     }
 
-    // Main loading logic
+    function maybeShowAlmost() {
+      // Idea (2): rare, fast disappearing text
+      if (Math.random() < 0.02 && progress > 85 && progress < 99) {
+        almostText.style.opacity = 1;
+        setTimeout(() => {
+          almostText.style.opacity = 0;
+        }, 700);
+      }
+    }
+
     function moveProgress() {
+      const now = Date.now();
+
+      // Idea (4): random micro-pause
+      if (now < pausedUntil) return;
+
+      if (Math.random() < 0.03) {
+        pausedUntil = now + (3000 + Math.random() * 3000);
+        return;
+      }
+
       if (phase === 1) {
-        // Phase 1: fast progress from 0% to 35%, no stopping
         progress += 1.5;
         if (progress >= 35) {
           progress = 35;
           phase = 2;
         }
       } else {
-        // Phase 2: slow progress from 35% to 97%, with trolling behavior
-        if (progress < 97) {
+        if (progress < 99) {
           progress += Math.random() * 0.4;
 
-          // 😈 Occasionally move backwards
           if (Math.random() < 0.05 && progress > 40) {
             progress -= Math.random() * 3;
+            vibrate();
           }
 
-          // Safety limits
-          if (progress > 97) progress = 97;
+          if (progress >= 99) {
+            progress = 99;
+            stuckAt99 = true;
+          }
+
           if (progress < 35) progress = 35;
+        } else if (stuckAt99) {
+          vibrate();
         }
       }
+
+      maybeShowAlmost();
       updateUI();
     }
 
-    // Run the loading loop
     setInterval(moveProgress, 300);
 
-    // Add the ad section last (Google AdSense)
+    // Refresh only after 1:45 (105000 ms)
+    setTimeout(() => {
+      location.reload();
+    }, 105000);
+
+    // Add the ad section last
     window.addEventListener("load", () => {
       const ad = document.createElement("div");
       ad.className = "ad-space";
@@ -139,11 +188,6 @@
       `;
       document.body.appendChild(ad);
     });
-
-    // Auto-refresh the page every 3 minutes
-    setTimeout(() => {
-      location.reload();
-    }, 180000);
   </script>
 
 </body>
