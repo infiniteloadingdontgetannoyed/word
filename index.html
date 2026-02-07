@@ -24,17 +24,40 @@
       position: relative;
     }
 
-    .joke-text {
-      color: #000; /* invisible text */
-      font-size: 18px;
+    /* Invisible disclaimer (only visible with CTRL + A) */
+    .disclaimer {
+      color: #000;
+      font-size: 12px;
       position: absolute;
-      top: 10px;
+      top: 8px;
+      user-select: text;
     }
 
     .percentage {
       color: #fff;
       font-size: 18px;
       margin-bottom: 10px;
+      text-align: center;
+    }
+
+    #loadingText {
+      font-size: 14px;
+      color: #aaa;
+      margin-bottom: 4px;
+      display: inline-block;
+    }
+
+    #dots {
+      display: inline-block;
+      animation: dotsFadeJump 1.6s infinite ease-in-out;
+    }
+
+    @keyframes dotsFadeJump {
+      0%   { opacity: 0; transform: translateY(0); }
+      25%  { opacity: 1; transform: translateY(-4px); }
+      50%  { opacity: 1; transform: translateY(0); }
+      75%  { opacity: 0; transform: translateY(2px); }
+      100% { opacity: 0; transform: translateY(0); }
     }
 
     .almost {
@@ -67,18 +90,22 @@
       text-align: center;
       position: absolute;
       bottom: 10px;
-      color: #fff;
       font-size: 16px;
     }
   </style>
 </head>
 <body>
 
-  <!-- If you're reading this, you already lost 😌 -->
+  <!-- Invisible disclaimer -->
+  <div class="disclaimer">
+    This page is a joke / parody. No real loading is happening.
+  </div>
 
-  <div class="joke-text">This page is a joke</div>
+  <div class="percentage">
+    <div id="loadingText">loading<span id="dots">...</span></div>
+    <span id="percentageNumber">0</span><span>%</span>
+  </div>
 
-  <div class="percentage" id="percentage">0%</div>
   <div class="almost" id="almost">Almost there…</div>
 
   <div class="loading-container">
@@ -87,46 +114,48 @@
 
   <script>
     const loadingBar = document.getElementById("loadingBar");
-    const percentageText = document.getElementById("percentage");
+    const percentageNumber = document.getElementById("percentageNumber");
     const almostText = document.getElementById("almost");
+    const loadingText = document.getElementById("loadingText");
 
     let progress = 0;
     let phase = 1;
     let stuckAt99 = false;
     let pausedUntil = 0;
 
-    // Console message for developers
+    // Message for curious developers
     console.log("%cStill watching the loader?", "color:#555");
 
     function vibrate() {
       if (navigator.vibrate) navigator.vibrate(80);
     }
 
-    function updateUI() {
-      // Idea (3): visual bar does not fully match the percentage near the end
-      let visualProgress = progress;
-      if (progress > 90) {
-        visualProgress = progress - 5;
+    function setLoadingText(text, withDots = false) {
+      if (withDots) {
+        loadingText.innerHTML = `loading<span id="dots">...</span>`;
+      } else {
+        loadingText.textContent = text;
       }
+    }
+
+    function updateUI() {
+      let visualProgress = progress;
+      if (progress > 90) visualProgress = progress - 5;
 
       loadingBar.style.width = visualProgress + "%";
-      percentageText.textContent = Math.floor(progress) + "%";
+      percentageNumber.textContent = Math.floor(progress);
     }
 
     function maybeShowAlmost() {
-      // Idea (2): rare, fast disappearing text
       if (Math.random() < 0.02 && progress > 85 && progress < 99) {
         almostText.style.opacity = 1;
-        setTimeout(() => {
-          almostText.style.opacity = 0;
-        }, 700);
+        setTimeout(() => almostText.style.opacity = 0, 700);
       }
     }
 
     function moveProgress() {
       const now = Date.now();
 
-      // Idea (4): random micro-pause
       if (now < pausedUntil) return;
 
       if (Math.random() < 0.03) {
@@ -166,12 +195,27 @@
 
     setInterval(moveProgress, 300);
 
-    // Refresh after 3:33 minutes (213000 ms)
+    // Rare text change after 1 minute
+    setTimeout(() => {
+      if (Math.random() < 0.5) {
+        setLoadingText("it's a joke");
+      } else {
+        setLoadingText("it is not loading");
+      }
+
+      // Return quickly to loading...
+      setTimeout(() => {
+        setLoadingText("loading", true);
+      }, 1200);
+
+    }, 60000);
+
+    // Refresh after 3:33 minutes
     setTimeout(() => {
       location.reload();
     }, 213000);
 
-    // Add the ad section last
+    // AdSense section (last)
     window.addEventListener("load", () => {
       const ad = document.createElement("div");
       ad.className = "ad-space";
